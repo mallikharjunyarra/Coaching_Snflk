@@ -1,2 +1,1 @@
-use database raw;
-select * from information_schema.views;
+select '1' ID,'Mallikharjun' name 
