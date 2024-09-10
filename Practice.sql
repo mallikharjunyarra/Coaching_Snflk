@@ -1,3 +1,4 @@
+https://signup.snowflake.com/?trial=student
 show integrations;
 desc storage integration S3_INT;
 show stages on emp;
