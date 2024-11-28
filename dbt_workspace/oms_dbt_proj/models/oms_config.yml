@@ -1,0 +1,32 @@
+models:
+  - name: Customer_stg
+    description: Staged customer data from order management system(OMS), With minor level changes.
+    columns:
+      - name: Email
+        description: Customer primary email ID for pramotions and offers.
+        tests:
+          - string_not_empty
+
+  - name: Order_stg
+    description: Staged orders from order management system(OMS), With minor row level information.
+    columns:
+      - name: ORDERID
+        description: Primary Key for Order_stg table.
+        tests:
+          - unique
+          - not_null
+      - name: STATUS
+        description: "{{ doc('STATUS') }}"
+        tests:
+          - accepted_values:
+              values: ['Shipped','Pending','Delivered','Processing','Cancelled']
+  - name: OrderItems_stg
+    description: Staged orders Items from order management system(OMS), With minor row level information.
+    columns:
+      - name: ORDERID
+        tests:
+          - relationships:
+              to: ref('Order_stg')
+              field: ORDERID
+  
+  

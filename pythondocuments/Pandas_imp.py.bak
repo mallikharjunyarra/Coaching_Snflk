@@ -1,0 +1,98 @@
+ 
+Pandas is a powerful and popular Python library used for data manipulation and analysis. Here are some of the most commonly used functions and methods in Pandas:
+
+1. Creating Data Structures
+    pd.DataFrame(): Create a DataFrame (2D labeled data structure) from dictionaries, lists, or other collections.
+    pd.Series(): Create a Series (1D labeled array) from a list, NumPy array, or dictionary.
+    pd.read_csv(): Read data from a CSV file into a DataFrame.
+    pd.read_excel(): Read data from an Excel file into a DataFrame.
+    pd.read_sql(): Read data from a SQL database into a DataFrame.
+    pd.read_json(): Read data from a JSON file into a DataFrame.
+2. Viewing and Inspecting Data
+    df.head(): Show the first few rows of the DataFrame.
+    df.tail(): Show the last few rows of the DataFrame.
+    df.info(): Get a summary of the DataFrame, including data types and non-null values.
+    df.describe(): Get statistical summaries of numerical columns (mean, min, max, etc.).
+    df.shape: Get the dimensions of the DataFrame (rows, columns).
+    df.columns: List the column names.
+    df.index: Get the row indices.
+3. Selecting and Filtering Data
+    df['column_name']: Select a single column as a Series.
+    df[['col1', 'col2']]: Select multiple columns.
+    df.iloc[]: Select rows and columns by index-based integer location.
+    df.loc[]: Select rows and columns by label.
+    df[df['column'] > value]: Filter rows based on condition.
+    df.query('column > value'): Query data using SQL-like syntax.
+4. Data Cleaning and Manipulation
+    df.dropna(): Remove rows or columns with missing values.
+    df.fillna(value): Fill missing values with a specified value.
+    df.drop(columns=['col1', 'col2']): Drop specified columns.
+    df.rename(columns={'old_name': 'new_name'}): Rename columns.
+    df.astype(): Change the data type of a column.
+    df.sort_values(by='column', ascending=False): Sort the DataFrame by a column.
+    df.apply(function): Apply a function to each element, row, or column.
+5. Aggregating and Grouping Data
+    df.groupby('column'): Group data by a specific column.
+    df.agg({'col1': 'mean', 'col2': 'sum'}): Perform aggregate operations on columns.
+    df.mean(), df.sum(), df.count(), df.min(), df.max(): Compute aggregate functions.
+    df.value_counts(): Count occurrences of unique values.
+6. Merging and Joining Data
+    pd.concat([df1, df2]): Concatenate DataFrames along a particular axis.
+    pd.merge(df1, df2, on='key'): Merge two DataFrames on a key column(s).
+    df.join(df2): Join DataFrames based on their index.
+7. Exporting Data
+    df.to_csv('filename.csv'): Save the DataFrame to a CSV file.
+    df.to_excel('filename.xlsx'): Save the DataFrame to an Excel file.
+    df.to_sql('table_name', connection): Save the DataFrame to a SQL database.
+    df.to_json('filename.json'): Save the DataFrame to a JSON file.
+8. Advanced Operations
+    df.pivot_table(): Create a pivot table.
+    df.crosstab(): Compute a cross-tabulation of two or more factors.
+    df.melt(): Unpivot a DataFrame from wide format to long format.
+    df.resample('M').sum(): Resample time series data (e.g., monthly).
+These functions and methods cover a wide range of tasks from reading data, inspecting it, cleaning it, and analyzing it to exporting results. Familiarity with these will help you handle most data manipulation tasks using Pandas
+
+
+import pandas as pd
+merged_df = pd.merge(e, d, on='DEPARTMENT_ID', how='inner')
+# Group by 'DEPTNO' and count the number of occurrences
+result = merged_df.groupby('DEPARTMENT_ID').size().reset_index(name='count')
+# Filter groups with count > 4 (equivalent to HAVING count(1) > 4)
+result = result[result['count'] > 2]
+# Display the result
+print(result)
+
+import boto3
+import pandas as pd
+from io import StringIO
+
+# AWS S3 bucket and file details
+bucket_name = 'your-bucket-name'
+source_key = 'path/to/large-file.csv'
+destination_prefix = 'path/to/split-files/'
+
+# S3 Client
+s3 = boto3.client('s3')
+
+# Step 1: Download the large file
+response = s3.get_object(Bucket=bucket_name, Key=source_key)
+data = response['Body'].read().decode('utf-8')
+
+# Step 2: Read the data into a Pandas DataFrame (use chunks if necessary)
+df = pd.read_csv(StringIO(data))
+
+# Step 3: Split into smaller files (e.g., 1000 rows per file)
+chunk_size = 1000
+for i, chunk in enumerate(range(0, df.shape[0], chunk_size)):
+    chunk_df = df.iloc[chunk:chunk + chunk_size]
+    
+    # Convert chunk DataFrame to CSV
+    chunk_data = chunk_df.to_csv(index=False)
+    
+    # Upload each chunk back to S3
+    s3.put_object(
+        Bucket=bucket_name,
+        Key=f"{destination_prefix}chunk_{i+1}.csv",
+        Body=chunk_data
+    )
+    print(f"Uploaded chunk_{i+1}.csv")
